@@ -24,6 +24,7 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include <spine/SkeletonAnimation.h>
 
 USING_NS_CC;
 
@@ -131,18 +132,21 @@ bool HelloWorld::init()
     my_Sprite->setAnchorPoint( Vec2( 0, 0 ) );
     this->addChild( my_Sprite, 0 );
 
-    auto tempPos = Vec2{ 0,0 };
+    auto anim = spine::SkeletonAnimation::createWithJsonFile( "./assets/hero_2.json", "./assets/hero_2.atlas" );
+    anim->setPosition( { 50, 50 } );
+    anim->setAnimation( 0, "move", true );
+    this->addChild( anim, 0 );
 
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = [=]( EventMouse* event ) 
                                  {
                                    if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) 
                                    {
-                                      my_Sprite->stopAllActions();
+                                      anim->stopAllActions();
                                       // Получаем координаты клика мыши
                                       Vec2 clickPos = event->getLocationInView();
 
-                                      auto currentPosition = my_Sprite->getPosition();
+                                      auto currentPosition = anim->getPosition();
                                       auto dstPosition = event->getLocationInView();   // some Vec2
 
                                       // getDistance is an arbitrary Vec2 function to get the distance between two points
@@ -153,7 +157,7 @@ bool HelloWorld::init()
                                       //// Создаем действие перемещения к указанной точке
                                       //auto moveAction = MoveTo::create( 2.0f, clickPos );
                                       //// Запускаем действие на спрайте
-                                      my_Sprite->runAction( moveAction );
+                                      anim->runAction( moveAction );
                                    }
                                  };
 
