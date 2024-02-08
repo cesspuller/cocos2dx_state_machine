@@ -29,16 +29,17 @@
 
 class HelloWorld : public cocos2d::Scene
 {
-public:
-    static cocos2d::Scene* createScene();
+   public:
 
-    virtual bool init();
-    
-    // a selector callback
-    void menuCloseCallback( cocos2d::Ref* pSender);
-    
-    // implement the "static create()" method manually
-    CREATE_FUNC( HelloWorld) ;
+   static cocos2d::Scene* createScene();
+
+   virtual bool init() override final;
+
+   // a selector callback
+   void menuCloseCallback( cocos2d::Ref* pSender );
+
+   // implement the "static create()" method manually
+   CREATE_FUNC( HelloWorld );
 };
 
 #endif // __HELLOWORLD_SCENE_H__

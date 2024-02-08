@@ -30,15 +30,15 @@ USING_NS_CC;
 
 Scene* HelloWorld::createScene()
 {
-    return HelloWorld::create();
-}
+   return HelloWorld::create();
+};
 
 // Print useful error message instead of segfaulting when files are not there.
-static void problemLoading(const char* filename) 
+static void problemLoading( const char* filename )
 {
-    printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
-}
+   printf( "Error while loading: %s\n", filename );
+   printf( "Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n" );
+};
 
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
@@ -62,8 +62,8 @@ bool HelloWorld::init()
                                            "CloseNormal.png",
                                            "CloseSelected.png",
                                            CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
-
+    
+    
     if (closeItem == nullptr ||
         closeItem->getContentSize().width <= 0 ||
         closeItem->getContentSize().height <= 0)
@@ -88,20 +88,20 @@ bool HelloWorld::init()
     // add a label shows "Hello World"
     // create and initialize a label
 
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-
-    if (label == nullptr)
-    {
-        problemLoading("'fonts/Marker Felt.ttf'");
-    }
-    else
-    {
-        // position the label on the center of the screen
-        label->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height - label->getContentSize().height));
-
-        // add the label as a child to this layer
-        this->addChild(label, 1);
-    }
+    //auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
+    //
+    //if (label == nullptr)
+    //{
+    //    problemLoading("'fonts/Marker Felt.ttf'");
+    //}
+    //else
+    //{
+    //    // position the label on the center of the screen
+    //    label->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height - label->getContentSize().height));
+    //
+    //    // add the label as a child to this layer
+    //    this->addChild(label, 1);
+    //}
 
     // add "HelloWorld" splash screen"
     auto sprite = Sprite::create("HelloWorld.png");
@@ -119,23 +119,12 @@ bool HelloWorld::init()
         this->addChild(sprite, 0);
     }
 
-    auto my_Sprite = Sprite::create( "CloseNormal.png" );
-
-    float x = origin.x + visibleSize.width - my_Sprite->getContentSize().width / 2 - 150;
-    float y = origin.y + my_Sprite->getContentSize().height / 2;
-    my_Sprite->setPosition( Vec2( x, y ) );
-
-    my_Sprite->setRotation( 0 );
-
-    my_Sprite->setScale( 1.0 ); // равномерно задает масштаб обеим осям X и Y
-
-    my_Sprite->setAnchorPoint( Vec2( 0, 0 ) );
-    this->addChild( my_Sprite, 0 );
-
     auto anim = spine::SkeletonAnimation::createWithJsonFile( "./assets/hero_2.json", "./assets/hero_2.atlas" );
-    anim->setPosition( { 50, 50 } );
-    anim->setAnimation( 0, "move", true );
+    anim->setPosition( { visibleSize.width / 2 + origin.x, 
+                         visibleSize.height / 2 + origin.y } );
+
     this->addChild( anim, 0 );
+    anim->setAnimation( 1, "idle", true );
 
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = [=]( EventMouse* event ) 
@@ -151,36 +140,85 @@ bool HelloWorld::init()
 
                                       // getDistance is an arbitrary Vec2 function to get the distance between two points
                                       auto distance = currentPosition.getDistance( dstPosition );
-                                      auto duration = distance / 100;             // This is the key part               
-                                      auto moveAction = MoveBy::create( duration, dstPosition - currentPosition );
+                                      auto duration = distance / 100;             // This is the key part
 
-                                      //// Создаем действие перемещения к указанной точке
-                                      //auto moveAction = MoveTo::create( 2.0f, clickPos );
-                                      //// Запускаем действие на спрайте
-                                      anim->runAction( moveAction );
+                                      auto temp = dstPosition - currentPosition;
+
+                                      if (temp.x > 0) 
+                                      {
+                                         anim->setScaleX( -1 ) ;
+                                      }
+                                      if (temp.x < 0)
+                                      {
+                                         anim->setScaleX( 1 );
+                                      }
+
+                                      auto moveAction = MoveBy::create( duration, dstPosition - currentPosition );
+                                      moveAction->setTag( 0 );
+
+                                      auto check = CallFunc::create( [=]() 
+                                                                     { 
+                                                                        anim->setAnimation( 1, "idle", true );
+                                                                     } );
+
+                                      anim->setAnimation( 1, "move", true );
+                                      auto check2 = Sequence::create( moveAction, check, nullptr );
+                                      anim->runAction( check2 );
+                                   }
+
+                                   if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT)
+                                   {
+                                      anim->stopAllActions();
+                                      auto currentPosition = anim->getPosition();
+                                      auto dstPosition = event->getLocationInView();   // some Vec2
+
+                                      auto temp = dstPosition - currentPosition;
+
+                                      if (temp.x > 0)
+                                      {
+                                         anim->setScaleX( -1 );
+                                      }
+                                      if (temp.x < 0)
+                                      {
+                                         anim->setScaleX( 1 );
+                                      }
+
+                                      auto attack = CallFunc::create( [=]()
+                                                                     {
+                                                                        anim->setAnimation( 1, "attack", false );
+                                                                     } );
+
+                                      auto idle = CallFunc::create( [=]()
+                                                                      {
+                                                                        anim->setAnimation( 1, "idle", true );
+                                                                      } );
+
+
+                                      auto check2 = Sequence::create( attack, idle, nullptr );
+
+                                      
+                                      anim->runAction( check2 );
                                    }
                                  };
+
 
     // Регистрация обработчика событий мыши
     _eventDispatcher->addEventListenerWithSceneGraphPriority( mouseListener, this );
     
     return true;
-}
+};
 
-
-void HelloWorld::menuCloseCallback(Ref* pSender)
+void HelloWorld::menuCloseCallback( Ref* pSender )
 {
-    //Close the cocos2d-x game scene and quit the application
-    Director::getInstance()->end();
+   //Close the cocos2d-x game scene and quit the application
+   Director::getInstance()->end();
 
-    #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+   exit( 0 );
 #endif
 
-    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() and exit(0) as given above,instead trigger a custom event created in RootViewController.mm as below*/
+   /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() and exit(0) as given above,instead trigger a custom event created in RootViewController.mm as below*/
 
-    //EventCustom customEndEvent("game_scene_close_event");
-    //_eventDispatcher->dispatchEvent(&customEndEvent);
-
-
-}
+   //EventCustom customEndEvent("game_scene_close_event");
+   //_eventDispatcher->dispatchEvent(&customEndEvent);
+};
