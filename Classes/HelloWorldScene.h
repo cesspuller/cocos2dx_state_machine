@@ -42,4 +42,50 @@ class HelloWorld : public cocos2d::Scene
    CREATE_FUNC( HelloWorld );
 };
 
+class TIdleState; 
+class TMoveState;
+class TAttackState;
+
+class TBaseState 
+{
+   public:
+
+      TBaseState() = default;
+
+      virtual ~TBaseState() = default;
+      virtual void handleInput() {};
+
+      static TIdleState idle;
+      static TMoveState move;
+      static TAttackState attack;
+
+   private:
+
+      TBaseState* base;
+};
+
+class TIdleState : public  TBaseState
+{
+   public:
+
+      virtual void handleInput() {};
+};
+
+class TMoveState : public  TBaseState
+{
+   public:
+
+      virtual void handleInput() 
+      {
+
+      };
+};
+
+class TAttackState : public  TBaseState
+{
+   public:
+
+      virtual void handleInput() {};
+};
+
 #endif // __HELLOWORLD_SCENE_H__

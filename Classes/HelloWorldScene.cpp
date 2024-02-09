@@ -58,8 +58,7 @@ bool HelloWorld::init()
     //    you may modify it.
 
     // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
+    auto closeItem = MenuItemImage::create("CloseNormal.png",
                                            "CloseSelected.png",
                                            CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
     
@@ -88,43 +87,39 @@ bool HelloWorld::init()
     // add a label shows "Hello World"
     // create and initialize a label
 
-    //auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    //
-    //if (label == nullptr)
-    //{
-    //    problemLoading("'fonts/Marker Felt.ttf'");
-    //}
-    //else
-    //{
-    //    // position the label on the center of the screen
-    //    label->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height - label->getContentSize().height));
-    //
-    //    // add the label as a child to this layer
-    //    this->addChild(label, 1);
-    //}
-
-    // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("HelloWorld.png");
-
-    if ( sprite == nullptr )
+    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
+    
+    if (label == nullptr)
     {
-        problemLoading("'HelloWorld.png'");
+        problemLoading("'fonts/Marker Felt.ttf'");
     }
     else
     {
-        // position the sprite on the center of the screen
-        sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
-        // add the sprite as a child to this layer
-        this->addChild(sprite, 0);
+        // position the label on the center of the screen
+        label->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height - label->getContentSize().height));
+    
+        // add the label as a child to this layer
+        this->addChild(label, 1);
     }
 
+
+
     auto anim = spine::SkeletonAnimation::createWithJsonFile( "./assets/hero_2.json", "./assets/hero_2.atlas" );
+
+    anim->addAnimation( 1, "idle", true );
+    //anim->addAnimation( 1, "move", true );
+    //anim->addAnimation( 1, "attack", false, 0.6 );
+
+    this->addChild( anim, 0 );
+
     anim->setPosition( { visibleSize.width / 2 + origin.x, 
                          visibleSize.height / 2 + origin.y } );
 
-    this->addChild( anim, 0 );
-    anim->setAnimation( 1, "idle", true );
+    
+    auto mouseListener1 = EventListenerCustom::create( "Idle", [=]( EventCustom* event )
+                                                               {
+                                                                   anim->setAnimation( 1, "idle", true );
+                                                               } );
 
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = [=]( EventMouse* event ) 
@@ -132,23 +127,21 @@ bool HelloWorld::init()
                                    if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) 
                                    {
                                       anim->stopAllActions();
-                                      // Получаем координаты клика мыши
-                                      Vec2 clickPos = event->getLocationInView();
 
                                       auto currentPosition = anim->getPosition();
-                                      auto dstPosition = event->getLocationInView();   // some Vec2
+                                      auto dstPosition = event->getLocationInView();  
 
-                                      // getDistance is an arbitrary Vec2 function to get the distance between two points
                                       auto distance = currentPosition.getDistance( dstPosition );
-                                      auto duration = distance / 100;             // This is the key part
+                                      auto duration = distance / 100;            
 
                                       auto temp = dstPosition - currentPosition;
 
-                                      if (temp.x > 0) 
+                                      if ( temp.x > 0 ) 
                                       {
                                          anim->setScaleX( -1 ) ;
                                       }
-                                      if (temp.x < 0)
+
+                                      if ( temp.x < 0 )
                                       {
                                          anim->setScaleX( 1 );
                                       }
@@ -161,7 +154,13 @@ bool HelloWorld::init()
                                                                         anim->setAnimation( 1, "idle", true );
                                                                      } );
 
-                                      anim->setAnimation( 1, "move", true );
+                                      
+                                      if ( anim->getCurrent( 1 )->animation->name != "move" ) 
+                                      {
+                                         label->setString( "IN IF " );
+                                         anim->setAnimation( 1, "move", true );
+                                      }
+
                                       auto check2 = Sequence::create( moveAction, check, nullptr );
                                       anim->runAction( check2 );
                                    }
@@ -185,28 +184,31 @@ bool HelloWorld::init()
 
                                       auto attack = CallFunc::create( [=]()
                                                                      {
-                                                                        anim->setAnimation( 1, "attack", false );
+                                                                           anim->setAnimation( 1, "attack", false );
                                                                      } );
+
+                                      auto delay = DelayTime::create( anim->getCurrent( 1 )->trackTime );
 
                                       auto idle = CallFunc::create( [=]()
                                                                       {
-                                                                        anim->setAnimation( 1, "idle", true );
+                                                                           anim->setAnimation( 1, "idle", true );
                                                                       } );
 
 
-                                      auto check2 = Sequence::create( attack, idle, nullptr );
+                                      auto check2 = Sequence::create( attack, delay, idle, nullptr );
 
                                       
                                       anim->runAction( check2 );
                                    }
                                  };
 
-
     // Регистрация обработчика событий мыши
+    _eventDispatcher->addEventListenerWithSceneGraphPriority( mouseListener1, this );
     _eventDispatcher->addEventListenerWithSceneGraphPriority( mouseListener, this );
     
     return true;
 };
+
 
 void HelloWorld::menuCloseCallback( Ref* pSender )
 {
