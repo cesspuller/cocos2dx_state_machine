@@ -107,8 +107,6 @@ bool HelloWorld::init()
     auto anim = spine::SkeletonAnimation::createWithJsonFile( "./assets/hero_2.json", "./assets/hero_2.atlas" );
 
     anim->addAnimation( 1, "idle", true );
-    //anim->addAnimation( 1, "move", true );
-    //anim->addAnimation( 1, "attack", false, 0.6 );
 
     this->addChild( anim, 0 );
 
@@ -120,7 +118,7 @@ bool HelloWorld::init()
                                                                {
                                                                    anim->setAnimation( 1, "idle", true );
                                                                } );
-
+    initKeyboard();
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = [=]( EventMouse* event ) 
                                  {
@@ -208,6 +206,54 @@ bool HelloWorld::init()
     
     return true;
 };
+
+void HelloWorld::initKeyboard()
+{
+   auto _mouseListener = EventListenerMouse::create();
+   _mouseListener->onMouseDown = CC_CALLBACK_1( HelloWorld::onKeyPressed, this );
+   
+   _eventDispatcher->addEventListenerWithSceneGraphPriority( _mouseListener, this );
+}
+
+void HelloWorld::onKeyPressed( Event* event )
+{
+   EventMouse* e = static_cast<EventMouse*>( event );
+
+   const auto key = e->getMouseButton();
+
+   /////////////////////////////////////////////////////////////////////////////////
+   auto label = Label::createWithTTF( "Hello World", "fonts/Marker Felt.ttf", 24 );
+
+   if (label == nullptr)
+   {
+      problemLoading( "'fonts/Marker Felt.ttf'" );
+   }
+   else
+   {
+      // position the label on the center of the screen
+      label->setPosition( Vec2( 200,200 ) );
+
+      // add the label as a child to this layer
+      this->addChild( label, 1 );
+   }
+   /////////////////////////////////////////////////////////////////////////////////
+
+   switch( key )
+   {
+   case EventMouse::MouseButton::BUTTON_LEFT:
+      label->setString("sssssssss");
+      break;
+   case  EventMouse::MouseButton::BUTTON_RIGHT:
+      label->setString( "zZZZZZzzz" );
+      break;
+   case EventMouse::MouseButton::BUTTON_UNSET:
+      label->setString( "log" );
+      break;
+
+   default:
+      break;
+   }
+}
 
 
 void HelloWorld::menuCloseCallback( Ref* pSender )

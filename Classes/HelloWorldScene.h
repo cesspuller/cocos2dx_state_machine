@@ -27,6 +27,8 @@
 
 #include "cocos2d.h"
 
+using namespace cocos2d;
+
 class HelloWorld : public cocos2d::Scene
 {
    public:
@@ -34,6 +36,10 @@ class HelloWorld : public cocos2d::Scene
    static cocos2d::Scene* createScene();
 
    virtual bool init() override final;
+
+   void initKeyboard();
+   void onKeyPressed( cocos2d::Event* event );
+   void onMouseMove( cocos2d::Event* event );
 
    // a selector callback
    void menuCloseCallback( cocos2d::Ref* pSender );
