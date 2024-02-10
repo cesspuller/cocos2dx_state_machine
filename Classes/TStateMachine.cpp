@@ -56,7 +56,7 @@ void TAttack::handleInput( SkeletonAnimation* player, EventMouse* mouseEvent )
       player->setScaleX( 1 );
    }
 
-   auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", false ); } );
+   auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", true ); } );
    auto idle = CallFunc::create( [=]() { player->setAnimation( 1, "idle", true ); } );
 
    if (std::string( player->getCurrent( 1 )->animation->name ) == std::string( "attack" ))
