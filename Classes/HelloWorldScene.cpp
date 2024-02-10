@@ -23,8 +23,6 @@
  ****************************************************************************/
 
 #include "HelloWorldScene.h"
-#include "SimpleAudioEngine.h"
-#include <spine/SkeletonAnimation.h>
 
 USING_NS_CC;
 
@@ -33,228 +31,89 @@ Scene* HelloWorld::createScene()
    return HelloWorld::create();
 };
 
-// Print useful error message instead of segfaulting when files are not there.
 static void problemLoading( const char* filename )
 {
    printf( "Error while loading: %s\n", filename );
    printf( "Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n" );
 };
 
-// on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
-    //////////////////////////////
-    // 1. super init first
     if ( !Scene::init() )
     {
         return false;
     }
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    initMenu();
+    initMouseListener();
+    initPlayerObj();
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create("CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-    
-    
-    if (closeItem == nullptr ||
-        closeItem->getContentSize().width <= 0 ||
-        closeItem->getContentSize().height <= 0)
-    {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
-    }
-    else
-    {
-        float x = origin.x + visibleSize.width - closeItem->getContentSize().width/2;
-        float y = origin.y + closeItem->getContentSize().height/2;
-        closeItem->setPosition(Vec2(x,y));
-    }
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    
-    if (label == nullptr)
-    {
-        problemLoading("'fonts/Marker Felt.ttf'");
-    }
-    else
-    {
-        // position the label on the center of the screen
-        label->setPosition(Vec2(origin.x + visibleSize.width/2, origin.y + visibleSize.height - label->getContentSize().height));
-    
-        // add the label as a child to this layer
-        this->addChild(label, 1);
-    }
-
-
-
-    auto anim = spine::SkeletonAnimation::createWithJsonFile( "./assets/hero_2.json", "./assets/hero_2.atlas" );
-
-    anim->addAnimation( 1, "idle", true );
-
-    this->addChild( anim, 0 );
-
-    anim->setPosition( { visibleSize.width / 2 + origin.x, 
-                         visibleSize.height / 2 + origin.y } );
-
-    
-    auto mouseListener1 = EventListenerCustom::create( "Idle", [=]( EventCustom* event )
-                                                               {
-                                                                   anim->setAnimation( 1, "idle", true );
-                                                               } );
-    initKeyboard();
-    auto mouseListener = EventListenerMouse::create();
-    mouseListener->onMouseDown = [=]( EventMouse* event ) 
-                                 {
-                                   if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT) 
-                                   {
-                                      anim->stopAllActions();
-
-                                      auto currentPosition = anim->getPosition();
-                                      auto dstPosition = event->getLocationInView();  
-
-                                      auto distance = currentPosition.getDistance( dstPosition );
-                                      auto duration = distance / 100;            
-
-                                      auto temp = dstPosition - currentPosition;
-
-                                      if ( temp.x > 0 ) 
-                                      {
-                                         anim->setScaleX( -1 ) ;
-                                      }
-
-                                      if ( temp.x < 0 )
-                                      {
-                                         anim->setScaleX( 1 );
-                                      }
-
-                                      auto moveAction = MoveBy::create( duration, dstPosition - currentPosition );
-                                      moveAction->setTag( 0 );
-
-                                      auto check = CallFunc::create( [=]() 
-                                                                     { 
-                                                                        anim->setAnimation( 1, "idle", true );
-                                                                     } );
-
-                                      
-                                      if ( anim->getCurrent( 1 )->animation->name != "move" ) 
-                                      {
-                                         label->setString( "IN IF " );
-                                         anim->setAnimation( 1, "move", true );
-                                      }
-
-                                      auto check2 = Sequence::create( moveAction, check, nullptr );
-                                      anim->runAction( check2 );
-                                   }
-
-                                   if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_RIGHT)
-                                   {
-                                      anim->stopAllActions();
-                                      auto currentPosition = anim->getPosition();
-                                      auto dstPosition = event->getLocationInView();   // some Vec2
-
-                                      auto temp = dstPosition - currentPosition;
-
-                                      if (temp.x > 0)
-                                      {
-                                         anim->setScaleX( -1 );
-                                      }
-                                      if (temp.x < 0)
-                                      {
-                                         anim->setScaleX( 1 );
-                                      }
-
-                                      auto attack = CallFunc::create( [=]()
-                                                                     {
-                                                                           anim->setAnimation( 1, "attack", false );
-                                                                     } );
-
-                                      auto delay = DelayTime::create( anim->getCurrent( 1 )->trackTime );
-
-                                      auto idle = CallFunc::create( [=]()
-                                                                      {
-                                                                           anim->setAnimation( 1, "idle", true );
-                                                                      } );
-
-
-                                      auto check2 = Sequence::create( attack, delay, idle, nullptr );
-
-                                      
-                                      anim->runAction( check2 );
-                                   }
-                                 };
-
-    // Регистрация обработчика событий мыши
-    _eventDispatcher->addEventListenerWithSceneGraphPriority( mouseListener1, this );
-    _eventDispatcher->addEventListenerWithSceneGraphPriority( mouseListener, this );
-    
     return true;
 };
 
-void HelloWorld::initKeyboard()
+void HelloWorld::initMenu()
+{
+   auto visibleSize = Director::getInstance()->getVisibleSize();
+   Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+   auto closeItem = MenuItemImage::create( "CloseNormal.png",
+                                           "CloseSelected.png",
+                                           CC_CALLBACK_1( HelloWorld::menuCloseCallback, this ) );
+
+   const float x = origin.x + visibleSize.width - closeItem->getContentSize().width / 2;
+   const float y = origin.y + closeItem->getContentSize().height / 2;
+   closeItem->setPosition( Vec2( x, y ) );
+
+   auto menu = Menu::create( closeItem, NULL );
+   menu->setPosition( Vec2::ZERO );
+   this->addChild( menu, 1 );
+}
+
+void HelloWorld::initMouseListener()
 {
    auto _mouseListener = EventListenerMouse::create();
-   _mouseListener->onMouseDown = CC_CALLBACK_1( HelloWorld::onKeyPressed, this );
+   _mouseListener->onMouseDown = CC_CALLBACK_1( HelloWorld::onMousePressed, this );
    
    _eventDispatcher->addEventListenerWithSceneGraphPriority( _mouseListener, this );
 }
 
-void HelloWorld::onKeyPressed( Event* event )
+void HelloWorld::initPlayerObj()
 {
-   EventMouse* e = static_cast<EventMouse*>( event );
+   auto visibleSize = Director::getInstance()->getVisibleSize();
+   Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-   const auto key = e->getMouseButton();
+   auto player = spine::SkeletonAnimation::createWithJsonFile( "./assets/hero_2.json", "./assets/hero_2.atlas" );
+   player->setName( "player" );
+   player->setPosition( { visibleSize.width / 2 + origin.x,
+                        visibleSize.height / 2 + origin.y } );
+
+   this->addChild( player, 0 );
+};
+
+void HelloWorld::onMousePressed( Event* event )
+{
+   EventMouse* mouseEvent = static_cast<EventMouse*>( event );
+
+   const auto key = mouseEvent->getMouseButton();
 
    /////////////////////////////////////////////////////////////////////////////////
-   auto label = Label::createWithTTF( "Hello World", "fonts/Marker Felt.ttf", 24 );
-
-   if (label == nullptr)
-   {
-      problemLoading( "'fonts/Marker Felt.ttf'" );
-   }
-   else
-   {
-      // position the label on the center of the screen
-      label->setPosition( Vec2( 200,200 ) );
-
-      // add the label as a child to this layer
-      this->addChild( label, 1 );
-   }
+   //auto label = Label::createWithTTF( "Hello World", "fonts/Marker Felt.ttf", 24 );
+   //label->setPosition( Vec2( 200,200 ) );
+   //this->addChild( label, 1 );
    /////////////////////////////////////////////////////////////////////////////////
 
    switch( key )
    {
-   case EventMouse::MouseButton::BUTTON_LEFT:
-      label->setString("sssssssss");
-      break;
-   case  EventMouse::MouseButton::BUTTON_RIGHT:
-      label->setString( "zZZZZZzzz" );
-      break;
-   case EventMouse::MouseButton::BUTTON_UNSET:
-      label->setString( "log" );
-      break;
-
-   default:
-      break;
+      case EventMouse::MouseButton::BUTTON_LEFT:
+         context.setState( new TMove() );
+         break;
+      case  EventMouse::MouseButton::BUTTON_RIGHT:
+         context.setState( new TAttack() );
+         break;
    }
-}
 
+   context.handleInput( dynamic_cast<SkeletonAnimation*>( this->getChildByName( "player" ) ), mouseEvent );
+}
 
 void HelloWorld::menuCloseCallback( Ref* pSender )
 {

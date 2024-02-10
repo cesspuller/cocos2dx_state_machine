@@ -26,6 +26,8 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "spine/spine-cocos2dx.h"
+#include "../Classes/TStateMachine.h"
 
 using namespace cocos2d;
 
@@ -37,61 +39,19 @@ class HelloWorld : public cocos2d::Scene
 
    virtual bool init() override final;
 
-   void initKeyboard();
-   void onKeyPressed( cocos2d::Event* event );
-   void onMouseMove( cocos2d::Event* event );
+   void initMouseListener();
+   void initPlayerObj();
+   void initMenu();
+
+   void onMousePressed( cocos2d::Event* event );
+
+   TStateContext context;
 
    // a selector callback
    void menuCloseCallback( cocos2d::Ref* pSender );
 
    // implement the "static create()" method manually
    CREATE_FUNC( HelloWorld );
-};
-
-class TIdleState; 
-class TMoveState;
-class TAttackState;
-
-class TBaseState 
-{
-   public:
-
-      TBaseState() = default;
-
-      virtual ~TBaseState() = default;
-      virtual void handleInput() {};
-
-      static TIdleState idle;
-      static TMoveState move;
-      static TAttackState attack;
-
-   private:
-
-      TBaseState* base;
-};
-
-class TIdleState : public  TBaseState
-{
-   public:
-
-      virtual void handleInput() {};
-};
-
-class TMoveState : public  TBaseState
-{
-   public:
-
-      virtual void handleInput() 
-      {
-
-      };
-};
-
-class TAttackState : public  TBaseState
-{
-   public:
-
-      virtual void handleInput() {};
 };
 
 #endif // __HELLOWORLD_SCENE_H__
