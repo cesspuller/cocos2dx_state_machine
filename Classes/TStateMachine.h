@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "spine/spine-cocos2dx.h"
+#include <string>
 
 using namespace cocos2d;
 using namespace spine;
@@ -53,10 +54,18 @@ class TMove : public TState
       moveAction->setTag( 0 );
 
       auto idle = CallFunc::create( [=](){ player->setAnimation( 1, "idle", true ); } );
-      auto move = CallFunc::create( [=]() { player->setAnimation( 1, "move", true ); } );
-;
-      auto sequence = Sequence::create( move, moveAction, idle, nullptr );
-      player->runAction( sequence );
+      auto move = CallFunc::create( [=](){ player->setAnimation( 1, "move", true ); } );
+
+      if( std::string( player->getCurrent( 1 )->animation->name ) == std::string( "move" ) )
+      {
+         auto actionSequence = Sequence::create( moveAction, idle, nullptr );
+         player->runAction( actionSequence );
+         
+         return;
+      }
+      
+      auto actionSequence = Sequence::create( move, moveAction, idle, nullptr );
+      player->runAction( actionSequence );
    }
 };
 
@@ -81,21 +90,30 @@ class TAttack : public TState
          player->setScaleX( 1 );
       }
 
-      auto attack = CallFunc::create( [=]()
-                                      {
-                                         player->setAnimation( 1, "attack", false );
-                                      } );
+      auto attack = CallFunc::create( [=](){ player->setAnimation( 1, "attack", false ); } );
+      auto idle = CallFunc::create( [=](){ player->setAnimation( 1, "idle", true ); } );
+      
+      //auto onAnimationComplete = [=]( spTrackEntry* ){ attack;
+      //                                                 idle; };
 
-      auto idle = CallFunc::create( [=]()
-                                    {
-                                       player->setAnimation( 1, "idle", true );
-                                    } );
+      auto onAnimationComplete = [=]( spTrackEntry* entry ) 
+         {
+            if( entry->animationEnd == 0 )
+            {
+               player->setAnimation( 0, "idle", true );
+            }
+         };
 
+      player->setCompleteListener( onAnimationComplete );
 
-      auto sequence = Sequence::create( attack, idle, nullptr );
+      spTrackEntry* te = player->setAnimation( 0, "attack", false );
+      auto delay = DelayTime::create( te->animationEnd );
 
+      //auto delay = DelayTime::create( 1 );
 
-      player->runAction( sequence );
+      //auto actionSequence = Sequence::create( attack, idle, nullptr );
+      auto actionSequence = Sequence::create( attack, delay, idle, nullptr );
+      player->runAction( actionSequence );
    }
 };
 

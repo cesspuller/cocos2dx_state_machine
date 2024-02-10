@@ -86,21 +86,16 @@ void HelloWorld::initPlayerObj()
    player->setName( "player" );
    player->setPosition( { visibleSize.width / 2 + origin.x,
                         visibleSize.height / 2 + origin.y } );
+   player->setAnimation( 1, "idle", true );
 
    this->addChild( player, 0 );
 };
 
 void HelloWorld::onMousePressed( Event* event )
 {
-   EventMouse* mouseEvent = static_cast<EventMouse*>( event );
+   EventMouse* mouseEvent = dynamic_cast<EventMouse*>( event );
 
    const auto key = mouseEvent->getMouseButton();
-
-   /////////////////////////////////////////////////////////////////////////////////
-   //auto label = Label::createWithTTF( "Hello World", "fonts/Marker Felt.ttf", 24 );
-   //label->setPosition( Vec2( 200,200 ) );
-   //this->addChild( label, 1 );
-   /////////////////////////////////////////////////////////////////////////////////
 
    switch( key )
    {
