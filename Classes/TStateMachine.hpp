@@ -42,13 +42,15 @@ class TStateContext
    
    TStateContext();
 
+   //! Функция установки актуального состояния персонажа
    void setState( TState* state );
 
+   //! Функция обработки инпута 
    void handleInput( SkeletonAnimation* player, EventMouse* mouseEvent );
 
    private:
 
-   TState* currentState;
+   TState* currentState;               // Указатель на базовый класс состояний
 };
 
 #endif // !_T_STATE_MACHINE_HPP_

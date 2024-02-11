@@ -36,17 +36,22 @@ class TScene : public cocos2d::Scene
 {
    public:
 
+   //!Статическая функция создания сцены
+   //! return -> указатель на объект сцены
    static cocos2d::Scene* createScene();
 
-   //! 
+   //!Функция инициализации сцены
    virtual bool init() override final;
 
+   //!Функция отслеживания нажатых клавиш 
+   //! event указатель на ивент
    void onMousePressed( cocos2d::Event* event );
 
-   TStateContext context;
+   TStateContext context;                        // Объект класса стейт машины
 
    private:
 
+   //!Функции инициализации всех объектов сцены
    void initMouseListener();
    void initPlayerObj();
    void initMenu();
