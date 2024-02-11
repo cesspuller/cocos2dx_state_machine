@@ -9,7 +9,7 @@
 using namespace cocos2d;
 using namespace spine;
 
-//! Интерфейс состояний
+//! РРЅС‚РµСЂС„РµР№СЃ СЃРѕСЃС‚РѕСЏРЅРёР№
 class TState
 {
    public:
@@ -21,7 +21,7 @@ class TState
    static int curDirection;
 };
 
-//! Состояние айдл
+//! РЎРѕСЃС‚РѕСЏРЅРёРµ Р°Р№РґР»
 class TIdle final : public TState
 {
    public:
@@ -29,7 +29,7 @@ class TIdle final : public TState
    virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) override;
 };
 
-//! Состояние перемещения
+//! РЎРѕСЃС‚РѕСЏРЅРёРµ РїРµСЂРµРјРµС‰РµРЅРёСЏ
 class TMove final : public TState
 {
    public:
@@ -37,7 +37,7 @@ class TMove final : public TState
    virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) override;
 };
 
-//! Состояние атаки  
+//! РЎРѕСЃС‚РѕСЏРЅРёРµ Р°С‚Р°РєРё  
 class TAttack final : public TState
 {
    public:
@@ -45,22 +45,22 @@ class TAttack final : public TState
    virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) override;
 };
 
-//! Класс управляющий состояниями персонажа
+//! РљР»Р°СЃСЃ СѓРїСЂР°РІР»СЏСЋС‰РёР№ СЃРѕСЃС‚РѕСЏРЅРёСЏРјРё РїРµСЂСЃРѕРЅР°Р¶Р°
 class TStateContext
 {
    public:
    
    TStateContext();
 
-   //! Функция установки актуального состояния персонажа
+   //! Р¤СѓРЅРєС†РёСЏ СѓСЃС‚Р°РЅРѕРІРєРё Р°РєС‚СѓР°Р»СЊРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РїРµСЂСЃРѕРЅР°Р¶Р°
    void setState( TState* state );
 
-   //! Функция обработки инпута 
+   //! Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РёРЅРїСѓС‚Р° 
    void handleInput( SkeletonAnimation* player, Event* mouseEvent );
 
    private:
 
-   TState* currentState;               // Указатель на базовый класс состояний
+   TState* currentState;               // РЈРєР°Р·Р°С‚РµР»СЊ РЅР° Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ СЃРѕСЃС‚РѕСЏРЅРёР№
 };
 
 #endif // !_T_STATE_MACHINE_HPP_
