@@ -65,26 +65,15 @@ void TAttack::handleInput( SkeletonAnimation* player, Event* mouseEvent )
    auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", false ); } );
    auto idle = CallFunc::create( [=]() { player->setAnimation( 1, "idle", true ); } );
 
-   if (std::string( player->getCurrent( 1 )->animation->name ) == std::string( "attack" ))
-   {
-      auto delayOff = DelayTime::create( 0.66 - 0.2 );
-      auto delayNew = DelayTime::create( 0.66 );
-      
-      auto actionSequence = Sequence::create( delayOff, attack, delayNew, idle, nullptr );
-      player->runAction( actionSequence );
+   auto onAnimationComplete = [=]( spTrackEntry* entry )
+                              {
+                                 if ( entry->animationEnd - entry->animationLast == 0)
+                                 {
+                                    player->setAnimation( 0, "attack", false );
+                                 }
+                              };
    
-      return;
-   }
-
-   //auto onAnimationComplete = [=]( spTrackEntry* entry )
-   //   {
-   //      //if ( entry->animationEnd - entry->animationLast == 0)
-   //      //{
-   //         player->setAnimation( 0, "attack", false );
-   //      //}
-   //   };
-   
-   //player->setCompleteListener( onAnimationComplete );
+   player->setCompleteListener( onAnimationComplete );
    
    //spTrackEntry* te = player->setAnimation( 0, "attack", false );  // BUG
    //auto delay = te->animationEnd;

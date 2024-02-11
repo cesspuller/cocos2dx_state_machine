@@ -77,12 +77,15 @@ void TScene::initMenu()
 
    buttonAttackImg->setPosition( Vec2( origin.x + visibleSize.width / 2 - 50,
                                     origin.y + visibleSize.height / 2 - 100 ) );
-
    buttonAttackImg->setTag( 1 );
 
    auto buttonAttack = Menu::create( buttonAttackImg, nullptr );
    buttonAttack->setPosition( Vec2::ZERO );
    buttonAttack->setName( "buttonAttack" );
+
+   auto buttonAttackLabel = Label::createWithTTF( "Attack", "fonts/arial.ttf", 12 );
+   buttonAttackLabel->setColor( Color3B::WHITE ); 
+   buttonAttackLabel->setPosition( buttonAttackImg->getPosition() );
 
    ////////////
 
@@ -92,18 +95,23 @@ void TScene::initMenu()
 
    buttonStopImg->setPosition( Vec2( origin.x + visibleSize.width / 2 + 50,
                                        origin.y + visibleSize.height / 2 - 100 ) );
-
    buttonStopImg->setTag( 1 );
 
    auto buttonStop = Menu::create( buttonStopImg, nullptr );
    buttonStop->setPosition( Vec2::ZERO );
    buttonStop->setName( "buttonStop" );
 
+   auto buttonStopLabel = Label::createWithTTF( "Stop", "fonts/arial.ttf", 12 );
+   buttonStopLabel->setColor( Color3B::WHITE ); 
+   buttonStopLabel->setPosition( buttonStopImg->getPosition() );
+
    ////////////
 
    this->addChild( menu, 1 );
    this->addChild( buttonAttack, 1 );
+   this->addChild( buttonAttackLabel, 1 );
    this->addChild( buttonStop, 1 );
+   this->addChild( buttonStopLabel, 1 );
 }
 
 void TScene::initMouseListener()
@@ -133,7 +141,7 @@ void TScene::onMousePressed( Event* event )
    EventMouse* mouseEvent = dynamic_cast< EventMouse* >(event);
 
    const auto key = mouseEvent->getMouseButton();
-   Vec2 clickPos = convertToNodeSpace( mouseEvent->getLocationInView() );
+   Vec2 clickPos = mouseEvent->getLocationInView() ;
 
    auto buttonStopBB = this->getChildByName( "buttonStop" )->getChildByTag( 1 )->getBoundingBox();
    auto buttonAttackBB = this->getChildByName( "buttonAttack" )->getChildByTag( 1 )->getBoundingBox();
