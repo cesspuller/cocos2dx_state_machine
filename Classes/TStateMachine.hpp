@@ -14,9 +14,19 @@ class TState
 {
    public:
 
-   virtual void handleInput( SkeletonAnimation* player, EventMouse* mouseEvent ) = 0;
+   virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) = 0;
 
    virtual ~TState() = default;
+
+   static int curDirection;
+};
+
+//! Состояние айдл
+class TIdle final : public TState
+{
+   public:
+
+   virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) override;
 };
 
 //! Состояние перемещения
@@ -24,7 +34,7 @@ class TMove final : public TState
 {
    public:
 
-   virtual void handleInput( SkeletonAnimation* player, EventMouse* mouseEvent ) override;
+   virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) override;
 };
 
 //! Состояние атаки  
@@ -32,7 +42,7 @@ class TAttack final : public TState
 {
    public:
 
-   virtual void handleInput( SkeletonAnimation* player, EventMouse* mouseEvent ) override;
+   virtual void handleInput( SkeletonAnimation* player, Event* mouseEvent ) override;
 };
 
 //! Класс управляющий состояниями персонажа
@@ -46,7 +56,7 @@ class TStateContext
    void setState( TState* state );
 
    //! Функция обработки инпута 
-   void handleInput( SkeletonAnimation* player, EventMouse* mouseEvent );
+   void handleInput( SkeletonAnimation* player, Event* mouseEvent );
 
    private:
 

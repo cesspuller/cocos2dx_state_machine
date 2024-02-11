@@ -56,6 +56,8 @@ void TScene::initMenu()
    auto visibleSize = Director::getInstance()->getVisibleSize();
    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+   ////////////
+
    auto closeItem = MenuItemImage::create( "CloseNormal.png",
                                            "CloseSelected.png",
                                            CC_CALLBACK_1( TScene::menuCloseCallback, this ) );
@@ -66,7 +68,42 @@ void TScene::initMenu()
 
    auto menu = Menu::create( closeItem, NULL );
    menu->setPosition( Vec2::ZERO );
+
+   ////////////
+
+   auto buttonAttackImg = MenuItemImage::create( "./assets/button.png",
+                                                 "./assets/button.png",
+                                                 CC_CALLBACK_1( TScene::onAttackButtonPressed, this ) );
+
+   buttonAttackImg->setPosition( Vec2( origin.x + visibleSize.width / 2 - 50,
+                                    origin.y + visibleSize.height / 2 - 100 ) );
+
+   buttonAttackImg->setTag( 1 );
+
+   auto buttonAttack = Menu::create( buttonAttackImg, nullptr );
+   buttonAttack->setPosition( Vec2::ZERO );
+   buttonAttack->setName( "buttonAttack" );
+
+   ////////////
+
+   auto buttonStopImg = MenuItemImage::create( "./assets/button.png",
+                                               "./assets/button.png",
+                                               CC_CALLBACK_1( TScene::onStopButtonPressed, this ) );
+
+   buttonStopImg->setPosition( Vec2( origin.x + visibleSize.width / 2 + 50,
+                                       origin.y + visibleSize.height / 2 - 100 ) );
+
+   buttonStopImg->setTag( 1 );
+
+   auto buttonStop = Menu::create( buttonStopImg, nullptr );
+   buttonStop->setPosition( Vec2::ZERO );
+   buttonStop->setName( "buttonStop" );
+
+   ////////////
+
    this->addChild( menu, 1 );
+   this->addChild( buttonAttack, 1 );
+   this->addChild( buttonStop, 1 );
 }
 
 void TScene::initMouseListener()
@@ -93,22 +130,38 @@ void TScene::initPlayerObj()
 
 void TScene::onMousePressed( Event* event )
 {
-   EventMouse* mouseEvent = dynamic_cast<EventMouse*>( event );
+   EventMouse* mouseEvent = dynamic_cast< EventMouse* >(event);
 
    const auto key = mouseEvent->getMouseButton();
+   Vec2 clickPos = convertToNodeSpace( mouseEvent->getLocationInView() );
 
-   switch( key )
+   auto buttonStopBB = this->getChildByName( "buttonStop" )->getChildByTag( 1 )->getBoundingBox();
+   auto buttonAttackBB = this->getChildByName( "buttonAttack" )->getChildByTag( 1 )->getBoundingBox();
+
+   if( key == EventMouse::MouseButton::BUTTON_LEFT 
+       && !buttonStopBB.containsPoint( clickPos )
+       && !buttonAttackBB.containsPoint( clickPos ) )
    {
-      case EventMouse::MouseButton::BUTTON_LEFT:
-         context.setState( new TMove );
-         break;
-      case  EventMouse::MouseButton::BUTTON_RIGHT:
-         context.setState( new TAttack );
-         break;
+      context.setState( new TMove );
+      context.handleInput( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" )), event );
    }
+};
 
-   context.handleInput( dynamic_cast<SkeletonAnimation*>( this->getChildByName( "player" ) ), mouseEvent );
-}
+void TScene::onAttackButtonPressed( Ref* pSender )
+{
+   Event* buttonEvent = dynamic_cast<Event*>(pSender);
+
+   context.setState( new TAttack );
+   context.handleInput( dynamic_cast<SkeletonAnimation*>( this->getChildByName( "player" ) ), buttonEvent );
+};
+
+void TScene::onStopButtonPressed( Ref* pSender )
+{
+   Event* buttonEvent = dynamic_cast<Event*>(pSender);
+
+   context.setState( new TIdle );
+   context.handleInput( dynamic_cast<SkeletonAnimation*>(this->getChildByName( "player" )), buttonEvent );
+};
 
 void TScene::menuCloseCallback( Ref* pSender )
 {

@@ -1,12 +1,28 @@
 #include "TStateMachine.hpp"
 
-void TMove::handleInput( SkeletonAnimation* player, EventMouse* mouseEvent )
+int TState::curDirection = 1;
+
+void TIdle::handleInput( SkeletonAnimation* player, Event* mouseEvent )
+{
+   if (std::string( player->getCurrent( 1 )->animation->name ) == std::string( "idle" ))
+   {
+      return;
+   }
+
+   player->stopAllActions();
+   player->setScaleX( curDirection );
+   player->setAnimation( 1, "idle", true );
+}
+
+void TMove::handleInput( SkeletonAnimation* player, Event* mouseEvent )
 {
    player->stopAllActions();
 
-   Vec2 clickPos = mouseEvent->getLocationInView();
+   EventMouse* event = dynamic_cast< EventMouse* >(mouseEvent);
+
+   Vec2 clickPos = event->getLocationInView();
    auto currentPosition = player->getPosition();
-   auto dstPosition = mouseEvent->getLocationInView();
+   auto dstPosition = event->getLocationInView();
    auto distance = currentPosition.getDistance( dstPosition );
    auto duration = distance / 100;
 
@@ -14,11 +30,13 @@ void TMove::handleInput( SkeletonAnimation* player, EventMouse* mouseEvent )
 
    if (direction.x > 0)
    {
-      player->setScaleX( -1 );
+      curDirection = -1;
+      player->setScaleX( curDirection );
    }
    if (direction.x < 0)
    {
-      player->setScaleX( 1 );
+      curDirection = 1;
+      player->setScaleX( curDirection );
    }
 
    auto moveAction = MoveBy::create( duration, dstPosition - currentPosition );
@@ -39,24 +57,12 @@ void TMove::handleInput( SkeletonAnimation* player, EventMouse* mouseEvent )
    player->runAction( actionSequence );
 };
 
-void TAttack::handleInput( SkeletonAnimation* player, EventMouse* mouseEvent )
+void TAttack::handleInput( SkeletonAnimation* player, Event* mouseEvent )
 {
    player->stopAllActions();
-
-   auto currentPosition = player->getPosition();
-   auto dstPosition = mouseEvent->getLocationInView();   // some Vec2
-   auto direction = dstPosition - currentPosition;
-
-   if (direction.x > 0)
-   {
-      player->setScaleX( -1 );
-   }
-   if (direction.x < 0)
-   {
-      player->setScaleX( 1 );
-   }
-
-   auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", true ); } );
+   player->setScaleX( curDirection );
+   
+   auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", false ); } );
    auto idle = CallFunc::create( [=]() { player->setAnimation( 1, "idle", true ); } );
 
    if (std::string( player->getCurrent( 1 )->animation->name ) == std::string( "attack" ))
@@ -100,7 +106,7 @@ void TStateContext::setState( TState* state )
    currentState = state;
 };
 
-void TStateContext::handleInput( SkeletonAnimation* player, EventMouse* mouseEvent )
+void TStateContext::handleInput( SkeletonAnimation* player, Event* mouseEvent )
 {
    currentState->handleInput( player, mouseEvent );
 };

@@ -47,6 +47,14 @@ class TScene : public cocos2d::Scene
    //! event указатель на ивент
    void onMousePressed( cocos2d::Event* event );
 
+   //!Функция отслеживания нажатых клавиш 
+   //! ref указатель на базовый класс Event
+   void onAttackButtonPressed( Ref* pSender );
+
+   //!Функция отслеживания нажатых клавиш 
+   //! ref указатель на базовый класс Event
+   void onStopButtonPressed( Ref* pSender );
+
    TStateContext context;                        // Объект класса стейт машины
 
    private:
