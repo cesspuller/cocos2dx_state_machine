@@ -62,35 +62,35 @@ void TAttack::handleInput( SkeletonAnimation* player, Event* mouseEvent )
    player->stopAllActions();
    player->setScaleX( curDirection );
    
-   auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", false ); } );
+   auto attack = CallFunc::create( [=]() { player->setAnimation( 1, "attack", true ); } );
    auto idle = CallFunc::create( [=]() { player->setAnimation( 1, "idle", true ); } );
 
-   auto onAnimationComplete = [=]( spTrackEntry* entry )
-                              {
-                                 if ( entry->animationEnd - entry->animationLast == 0)
-                                 {
-                                    player->setAnimation( 0, "attack", false );
-                                 }
-                              };
+   if (std::string( player->getCurrent( 1 )->animation->name ) == std::string( "attack" ))
+   {
+      auto delayRem = DelayTime::create( 0.367 );
+      auto delayNew = DelayTime::create( 0.667 );
    
-   player->setCompleteListener( onAnimationComplete );
+      auto actionSequence = Sequence::create( delayRem, attack, delayNew, idle, nullptr );
+      player->runAction( actionSequence );
    
-   //spTrackEntry* te = player->setAnimation( 0, "attack", false );  // BUG
-   //auto delay = te->animationEnd;
+      return;
+   }
 
-   auto delay1 = DelayTime::create( 0.66 );
+   //auto onAnimationComplete = [=]( spTrackEntry* entry ){};
+   //player->setCompleteListener( onAnimationComplete );
+   
+   auto delay = DelayTime::create( 0.6667 );
+   auto actionSequence = Sequence::create( attack, delay, idle, nullptr );
 
-   auto actionSequence = Sequence::create( attack, delay1, idle, nullptr );
-   //auto actionSequence = Sequence::create( attack, delay1, idle, nullptr );
    player->runAction( actionSequence );
 };
 
 TStateContext::TStateContext()
 {
-   currentState = new TMove();
+   currentState = std::make_shared<TIdle>( TIdle{} );
 };
 
-void TStateContext::setState( TState* state )
+void TStateContext::setState( std::shared_ptr<TState> state )
 {
    currentState = state;
 };

@@ -150,24 +150,24 @@ void TScene::onMousePressed( Event* event )
        && !buttonStopBB.containsPoint( clickPos )
        && !buttonAttackBB.containsPoint( clickPos ) )
    {
-      context.setState( new TMove );
+      context.setState( std::make_shared<TMove>( TMove{} ) );
       context.handleInput( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" )), event );
    }
 };
 
 void TScene::onAttackButtonPressed( Ref* pSender )
 {
-   Event* buttonEvent = dynamic_cast<Event*>(pSender);
+   Event* buttonEvent = dynamic_cast<Event*>( pSender );
 
-   context.setState( new TAttack );
+   context.setState( std::make_shared<TAttack>( TAttack{} ) );
    context.handleInput( dynamic_cast<SkeletonAnimation*>( this->getChildByName( "player" ) ), buttonEvent );
 };
 
 void TScene::onStopButtonPressed( Ref* pSender )
 {
-   Event* buttonEvent = dynamic_cast<Event*>(pSender);
+   Event* buttonEvent = dynamic_cast<Event*>( pSender );
 
-   context.setState( new TIdle );
+   context.setState( std::make_shared<TIdle>( TIdle{} ) );
    context.handleInput( dynamic_cast<SkeletonAnimation*>(this->getChildByName( "player" )), buttonEvent );
 };
 

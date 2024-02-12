@@ -18,6 +18,8 @@ class TState
 
    virtual ~TState() = default;
 
+   protected:
+
    static int curDirection;
 };
 
@@ -53,14 +55,14 @@ class TStateContext
    TStateContext();
 
    //! Функция установки актуального состояния персонажа
-   void setState( TState* state );
+   void setState( std::shared_ptr<TState> state );
 
    //! Функция обработки инпута 
    void handleInput( SkeletonAnimation* player, Event* mouseEvent );
 
    private:
 
-   TState* currentState;               // Указатель на базовый класс состояний
+   std::shared_ptr<TState> currentState;               // Указатель на базовый класс состояний
 };
 
 #endif // !_T_STATE_MACHINE_HPP_
