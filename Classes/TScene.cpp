@@ -165,10 +165,13 @@ void TScene::onAttackButtonPressed( Ref* pSender )
 
 void TScene::onStopButtonPressed( Ref* pSender )
 {
-   Event* buttonEvent = dynamic_cast<Event*>( pSender );
+   if (std::string( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" ))->getCurrent( 1 )->animation->name ) != std::string( "attack" ))
+   {
+      Event* buttonEvent = dynamic_cast< Event* >(pSender);
 
-   context.setState( std::make_shared<TIdle>( TIdle{} ) );
-   context.handleInput( dynamic_cast<SkeletonAnimation*>(this->getChildByName( "player" )), buttonEvent );
+      context.setState( std::make_shared<TIdle>( TIdle{} ) );
+      context.handleInput( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" )), buttonEvent );
+   }
 };
 
 void TScene::menuCloseCallback( Ref* pSender )

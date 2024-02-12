@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Sinkholer\OneDrive\Рабочий стол\Test\proj.win32\Debug.win32\libcocos2d.dll</FullPath>
+      <FullPath>C:\Users\Sinkholer\OneDrive\Рабочий стол\cocos2dx_test\proj.win32\Debug.win32\libcocos2d.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
