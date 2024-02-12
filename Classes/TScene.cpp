@@ -138,20 +138,23 @@ void TScene::initPlayerObj()
 
 void TScene::onMousePressed( Event* event )
 {
-   EventMouse* mouseEvent = dynamic_cast< EventMouse* >(event);
-
-   const auto key = mouseEvent->getMouseButton();
-   Vec2 clickPos = mouseEvent->getLocationInView() ;
-
-   auto buttonStopBB = this->getChildByName( "buttonStop" )->getChildByTag( 1 )->getBoundingBox();
-   auto buttonAttackBB = this->getChildByName( "buttonAttack" )->getChildByTag( 1 )->getBoundingBox();
-
-   if( key == EventMouse::MouseButton::BUTTON_LEFT 
-       && !buttonStopBB.containsPoint( clickPos )
-       && !buttonAttackBB.containsPoint( clickPos ) )
+   if (std::string( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" ))->getCurrent( 1 )->animation->name ) != std::string( "attack" ))
    {
-      context.setState( std::make_shared<TMove>( TMove{} ) );
-      context.handleInput( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" )), event );
+      EventMouse* mouseEvent = dynamic_cast< EventMouse* >(event);
+
+      const auto key = mouseEvent->getMouseButton();
+      Vec2 clickPos = mouseEvent->getLocationInView();
+
+      auto buttonStopBB = this->getChildByName( "buttonStop" )->getChildByTag( 1 )->getBoundingBox();
+      auto buttonAttackBB = this->getChildByName( "buttonAttack" )->getChildByTag( 1 )->getBoundingBox();
+
+      if (key == EventMouse::MouseButton::BUTTON_LEFT
+           && !buttonStopBB.containsPoint( clickPos )
+           && !buttonAttackBB.containsPoint( clickPos ))
+      {
+         context.setState( std::make_shared<TMove>( TMove{} ) );
+         context.handleInput( dynamic_cast< SkeletonAnimation* >(this->getChildByName( "player" )), event );
+      }
    }
 };
 
