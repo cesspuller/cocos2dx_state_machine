@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Sinkholer\Test\proj.win32\Release.win32\libcocos2d.dll</FullPath>
+      <FullPath>C:\Users\Sinkholer\OneDrive\Рабочий стол\Test\proj.win32\Release.win32\libcocos2d.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>C:\Users\Sinkholer\Test\proj.win32\Release.win32\Test.exe</FullPath>
+      <FullPath>C:\Users\Sinkholer\OneDrive\Рабочий стол\Test\proj.win32\Release.win32\Test.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

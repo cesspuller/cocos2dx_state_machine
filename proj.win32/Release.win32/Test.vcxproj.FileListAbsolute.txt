@@ -1,1 +1,2 @@
 C:\Users\Sinkholer\Test\proj.win32\Release.win32\Test.exe
+C:\Users\Sinkholer\OneDrive\Рабочий стол\Test\proj.win32\Release.win32\Test.exe
